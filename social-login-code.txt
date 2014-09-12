@@ -1,0 +1,61 @@
+<!-- Some social login buttons, you can delete these or add different ones from your AddShoppers dashboard under Apps > Social Login -->
+<div class="social-commerce-signin-facebook" data-style="logoandtext" data-size="medium"></div>
+<div class="social-commerce-signin-google" data-style="logoandtext" data-size="medium"></div>
+<div class="social-commerce-signin-linkedin" data-style="logoandtext" data-size="medium"></div>
+
+{literal}
+<script type="text/javascript">
+        function init() {
+			AddShoppersWidget.API.Event.bind("sign_in", createAccount);
+		};
+
+        function createAccount(params) {
+        	if (params.source == "social_login") {
+				services = ['facebook', 'google', 'linkedin', 'twitter', 'paypal'];
+				var data = AddShoppersWidget.API.User.signed_data();
+				for( var i=0; i < services.length; i++ ) {
+					service = services[i];
+					if (AddShoppersWidget.API.User.signed(service)) {
+						var email = data[service + '_email']; // check if account in db // if is ​break
+						if (service == 'twitter') {
+							//alert('popup get email'); 
+						};
+						if (email) {
+							if (service != 'facebook' && service !='twitter' ) {
+								var name = data[service + '_firstname'] + '_' + data[service + '_lastname'];
+							} 
+							else {
+								var name = data[service + '_name'];
+								name = name.replace(' ', '_');
+							};
+							var loc = "/create.php?asusrnm=" + name + "&aseml=" + email + "&data=" + JSON.stringify(data);
+							jQuery.ajax({
+        						type: "POST",
+        						async: true,
+        						url: loc,
+        						data:  { 'direction': 'up' },
+        						dataType: "json",
+        						contentType: "application/json; charset=utf-8",
+        						success: function (msg) { location.reload() },
+        						error: function (err){ }
+    						});
+							break;
+						};
+					};
+				};
+			}; 
+		}
+		
+		if (window.addEventListener) {                        
+  			window.addEventListener("load", init, false); 
+		}
+		else {
+  			document.onreadystatechange = function() { 
+   				if(document.readyState in {loaded: 1, complete: 1}) {
+       				document.onreadystatechange = null; 
+      				init();    
+      				 }                                        
+			}                    
+   		}
+</script>
+{/literal}
